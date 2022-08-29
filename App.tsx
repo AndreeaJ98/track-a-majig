@@ -7,6 +7,7 @@ import { calculateMessagesSum } from "./src/lib/utilities";
 import ExpensesScreen from "./src/screens/ExpensesScreen";
 import HomeScreen from "./src/screens/HomeScreen";
 import SettingsScreen from "./src/screens/SettingsScreen";
+import { MenuProvider } from 'react-native-popup-menu';
 
 export default function App() {
   const Tab = createBottomTabNavigator();
@@ -29,7 +30,7 @@ export default function App() {
     if (text == "") return;
 
     const currentDate = new Date();
-    const newMessages = [...messages, { message: text, currentDate }];
+    const newMessages = [...messages, { message: text, currentDate, isEditMode: false }];
 
     onChangeMessages(newMessages);
     storeData(newMessages);
@@ -41,25 +42,34 @@ export default function App() {
     storeData(messages);
   }
 
+  const onEditMessage = async function (index: number) {
+    // var messages = [70,80]
+    let message = messages[index];
+    message.isEditMode = true;
+    storeData(messages);
+  }
+
   return (
-    <View style={styles.root}>
-      <View style={styles.tabs}>
-        <NavigationContainer>
-          <Tab.Navigator>
-            <Tab.Screen
-              name="Expenses"
-              children={() => <ExpensesScreen totalSpent={totalSpent} />}
-            />
-            <Tab.Screen
-              name="Home"
-              children={() => <HomeScreen messages={messages} onSubmitMessage={onSubmitMessage}
-              onDeleteMessage={onDeleteMessage}/>}
-            />
-            <Tab.Screen name="Settings" component={SettingsScreen} />
-          </Tab.Navigator>
-        </NavigationContainer>
+    <MenuProvider>
+      <View style={styles.root}>
+        <View style={styles.tabs}>
+          <NavigationContainer>
+            <Tab.Navigator>
+              <Tab.Screen
+                name="Expenses"
+                children={() => <ExpensesScreen totalSpent={totalSpent} />}
+              />
+              <Tab.Screen
+                name="Home"
+                children={() => <HomeScreen messages={messages} onSubmitMessage={onSubmitMessage}
+                  onDeleteMessage={onDeleteMessage} onEditMessage={onEditMessage}/>}
+              />
+              <Tab.Screen name="Settings" component={SettingsScreen} />
+            </Tab.Navigator>
+          </NavigationContainer>
+        </View>
       </View>
-    </View>
+    </MenuProvider>
   );
 }
 

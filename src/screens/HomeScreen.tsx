@@ -1,12 +1,23 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Button, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Button, ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, View } from "react-native";
 import { LogMessage } from "../lib/localStorage";
+import { MenuProvider } from 'react-native-popup-menu';
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from 'react-native-popup-menu';
+import { renderers } from 'react-native-popup-menu';
+import { Message } from "../lib/Message";
+const { SlideInMenu } = renderers;
 
 type Props = {
   messages: LogMessage[];
   onSubmitMessage: (text: string) => {};
   onDeleteMessage: (index: number) => {};
+  onEditMessage: (index: number) => {};
 };
 
 export default function HomeScreen(props: Props) {
@@ -22,16 +33,24 @@ export default function HomeScreen(props: Props) {
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
         {props.messages.map((entry, i) => (
-          <View>
-            <Text style={styles.singleMessage} key={i}>
-              {entry.message}
-            </Text>
-            <View style={styles.button}>
-              <Button
-                onPress={() => props.onDeleteMessage(i)}
-                title="x"
-              />
-            </View>
+          <View key={i}>
+            <Menu renderer={SlideInMenu}>
+              <MenuTrigger triggerOnLongPress={true}>
+                {entry.isEditMode == true
+                  ? <TextInput>{entry.message}</TextInput>
+                  : <Text style={styles.singleMessage} key={i}>
+                    {entry.message}
+                  </Text>
+                }
+         
+              </MenuTrigger>
+              <MenuOptions>
+                <MenuOption onSelect={() => props.onEditMessage(i)} text='Edit' />
+                <MenuOption onSelect={() => props.onDeleteMessage(i)}>
+                  <Text style={{ color: 'red' }}>Delete</Text>
+                </MenuOption>
+              </MenuOptions>
+            </Menu>
           </View>
         ))}
       </ScrollView>
@@ -52,6 +71,7 @@ export default function HomeScreen(props: Props) {
         </View>
       </View>
       <StatusBar style="auto" />
+      <Message text="Masina" isEditMode={true}/>
     </View>
   );
 }

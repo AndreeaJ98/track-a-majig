@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export interface LogMessage {
   message: string;
   currentDate: Date;
+  isEditMode: boolean;
 }
 
 export const storeData = async (value: LogMessage[]) => {
